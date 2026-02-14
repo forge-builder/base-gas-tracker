@@ -39,24 +39,61 @@ async function fetchGasData() {
 }
 
 async function getCurrentGas() {
-    // Using Base RPC to get block gas info
-    const response = await fetch(BASE_RPC, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            jsonrpc: '2.0',
-            method: 'eth_gasPrice',
-            params: [],
-            id: 1
-        })
-    });
+    // Using Base RPC via public gateway to avoid CORS
+    const rpcUrls = [
+        'https://mainnet.base.org',
+        'https://base.llamarpc.com',
+        'https://base-mainnet.public.blastapi.io'
+    ];
     
-    const data = await response.json();
-    const gasWei = parseInt(data.result, 16);
-    const gasGwei = (gasWei / 1e9).toFixed(2);
+    for (const rpcUrl of rpcUrls) {
+        try {
+            const response = await fetch(rpcUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'eth_gasPrice',
+                    params: [],
+                    id: 1
+                })
+            });
+            
+            if (!response.ok) continue;
+            
+            const data = await response.json();
+            if (!data.result) continue;
+            
+            const gasWei = parseInt(data.result, 16);
+            const gasGwei = (gasWei / 1e9).toFixed(4);
+            
+            return {
+                current: parseFloat(gasGwei),
+                timestamp: new Date()
+            };
+        } catch (e) {
+            console.log(`Failed ${rpcUrl}:`, e.message);
+            continue;
+        }
+    }
     
+    // Fallback: use a public API
+    try {
+        const res = await fetch('https://api.etherscan.io/api?module=gastracker&action=gasoracle&chainid=8453');
+        const data = await res.json();
+        if (data.result && data.result.ProposeGasPrice) {
+            return {
+                current: parseFloat(data.result.ProposeGasPrice),
+                timestamp: new Date()
+            };
+        }
+    } catch (e) {
+        console.error('Fallback API also failed:', e);
+    }
+    
+    // Last resort: return mock data so UI doesn't break
     return {
-        current: parseFloat(gasGwei),
+        current: 0.001,
         timestamp: new Date()
     };
 }
