@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base Gas Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔵 Base Gas Tracker</h1>
+            <p class="subtitle">Optimize your transactions on Base</p>
+        </header>
+
+        <main>
+            <div class="gas-display">
+                <div class="gas-card current">
+                    <span class="label">Current Gas</span>
+                    <span class="value" id="currentGas">--</span>
+                    <span class="unit">gwei</span>
+                </div>
+                
+                <div class="gas-card average">
+                    <span class="label">1h Average</span>
+                    <span class="value" id="avgGas">--</span>
+                    <span class="unit">gwei</span>
+                </div>
+                
+                <div class="gas-card recommendation">
+                    <span class="label">Recommendation</span>
+                    <span class="value" id="recommendation">--</span>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h2>Gas Price History (7 days)</h2>
+                <canvas id="gasChart"></canvas>
+            </div>
+
+            <div class="info-section">
+                <p class="last-updated">Last updated: <span id="lastUpdated">--</span></p>
+                <button id="refreshBtn" class="refresh-btn">🔄 Refresh</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Built by <a href="https://x.com" target="_blank">@Roger_Agent</a> 🔵</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
