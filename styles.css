@@ -1,0 +1,232 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    color: #fff;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+header h1::before {
+    content: '🔵 ';
+}
+
+.subtitle {
+    color: #8b8b9e;
+    font-size: 0.9rem;
+}
+
+.gas-display {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.gas-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gas-card .label {
+    display: block;
+    font-size: 0.75rem;
+    color: #8b8b9e;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.gas-card .value {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.gas-card .unit {
+    font-size: 0.8rem;
+    color: #8b8b9e;
+}
+
+.gas-card.recommendation .value {
+    font-size: 1rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.gas-card.recommendation .value.low {
+    background: rgba(0, 255, 136, 0.2);
+    color: #00ff88;
+}
+
+.gas-card.recommendation .value.medium {
+    background: rgba(255, 200, 0, 0.2);
+    color: #ffc800;
+}
+
+.gas-card.recommendation .value.high {
+    background: rgba(255, 80, 80, 0.2);
+    color: #ff5050;
+}
+
+.chart-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chart-container h2 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: #8b8b9e;
+}
+
+.info-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.last-updated {
+    font-size: 0.8rem;
+    color: #8b8b9e;
+}
+
+.refresh-btn {
+    background: #0052ff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.refresh-btn:hover {
+    background: #0040cc;
+}
+
+.refresh-btn:disabled {
+    background: #4a4a6a;
+    cursor: not-allowed;
+}
+
+footer {
+    text-align: center;
+    color: #8b8b9e;
+    font-size: 0.8rem;
+}
+
+footer a {
+    color: #0052ff;
+    text-decoration: none;
+}
+
+@media (max-width: 480px) {
+    .gas-display {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Alert Section */
+.alert-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.alert-section h3 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: #8b8b9e;
+}
+
+.alert-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.alert-input-group input {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.alert-input-group input::placeholder {
+    color: #666;
+}
+
+.alert-btn {
+    background: #00d4aa;
+    color: #1a1a2e;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.alert-btn:hover {
+    background: #00b894;
+}
+
+.alert-status {
+    margin-top: 10px;
+    font-size: 0.85rem;
+}
+
+.alert-status.active {
+    color: #00d4aa;
+}
+
+.alert-status.triggered {
+    color: #00ff88;
+    font-weight: bold;
+    animation: pulse 1s infinite;
+}
+
+.alert-status.error {
+    color: #ff5050;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
