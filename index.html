@@ -45,6 +45,15 @@
                 <canvas id="gasChart"></canvas>
             </div>
 
+            <div class="alert-section">
+                <h3>🔔 Gas Alert</h3>
+                <div class="alert-input-group">
+                    <input type="number" id="targetGas" placeholder="Target gas (gwei)" step="0.001" />
+                    <button id="setAlertBtn" class="alert-btn">Set Alert</button>
+                </div>
+                <p id="alertStatus" class="alert-status"></p>
+            </div>
+
             <div class="info-section">
                 <p class="last-updated">Last updated: <span id="lastUpdated">--</span></p>
                 <button id="refreshBtn" class="refresh-btn">🔄 Refresh</button>

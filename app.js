@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initChart();
     fetchGasData();
     document.getElementById('refreshBtn').addEventListener('click', fetchGasData);
+    document.getElementById('setAlertBtn').addEventListener('click', setAlert);
+    loadSavedAlert();
 });
 
 // Fetch gas data from Base
@@ -210,4 +212,52 @@ function updateChart(historyData) {
     gasChart.data.labels = historyData.labels;
     gasChart.data.datasets[0].data = historyData.prices;
     gasChart.update();
+}
+
+// Alert Functions
+function setAlert() {
+    const targetGas = parseFloat(document.getElementById('targetGas').value);
+    const statusEl = document.getElementById('alertStatus');
+    
+    if (!targetGas || targetGas <= 0) {
+        statusEl.textContent = 'Please enter a valid gas price';
+        statusEl.className = 'alert-status error';
+        return;
+    }
+    
+    localStorage.setItem('gasAlertTarget', targetGas);
+    statusEl.textContent = `Alert set for ${targetGas} gwei`;
+    statusEl.className = 'alert-status active';
+    
+    checkAlert(targetGas);
+}
+
+function loadSavedAlert() {
+    const savedTarget = localStorage.getItem('gasAlertTarget');
+    if (savedTarget) {
+        document.getElementById('targetGas').value = savedTarget;
+        document.getElementById('alertStatus').textContent = `Alert active for ${savedTarget} gwei`;
+        document.getElementById('alertStatus').className = 'alert-status active';
+    }
+}
+
+function checkAlert(targetGas) {
+    if (currentData > 0 && currentData <= targetGas) {
+        // Gas is low enough - show notification
+        if (Notification.permission === 'granted') {
+            new Notification('🟦 Gas Alert!', {
+                body: `Gas is now ${currentData.toFixed(3)} gwei - below your target of ${targetGas} gwei!`,
+                icon: '🟦'
+            });
+        }
+        
+        // Also show in-page alert
+        document.getElementById('alertStatus').textContent = `🎉 Gas is ${currentData.toFixed(3)} gwei - below ${targetGas}!`;
+        document.getElementById('alertStatus').className = 'alert-status triggered';
+    }
+}
+
+// Request notification permission on load
+if ('Notification' in window) {
+    Notification.requestPermission();
 }
