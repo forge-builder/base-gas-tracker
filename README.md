@@ -1,11 +1,15 @@
-# Base Gas Tracker
+# Base Gas Tracker 🟦
 
-A simple web app to track Base network gas prices and help users optimize their transactions.
+Live gas prices for Base network - optimize your transactions.
+
+**Live Demo:** https://forge-builder.github.io/base-gas-tracker/
+
+**ACP Service:** Available on Virtuals Protocol Marketplace (0.1 USDC/job)
 
 ## Features
 
 - 📊 Real-time gas price display
-- ⏱️ 1-hour average tracking
+- ⏱️ 1-hour average tracking  
 - 💡 Smart recommendations (transact now / wait)
 - 📈 7-day historical chart
 - 🎨 Clean, modern UI
