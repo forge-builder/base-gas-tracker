@@ -118,10 +118,20 @@ async function getHistoricalGas() {
 
 function updateDisplay(gasData) {
     const currentGas = gasData.current;
+    const ethPrice = 1981; // Fallback - should fetch live
     currentData = currentGas; // Store for avg calculation
+    
+    // Calculate USD fee (21k gas * gas price * ETH price)
+    const gasInWei = currentGas * 1e9;
+    const feeInWei = gasInWei * 21000;
+    const feeInEth = feeInWei / 1e18;
+    const feeInUsd = feeInEth * ethPrice;
     
     // Update current gas
     document.getElementById('currentGas').textContent = currentGas.toFixed(3);
+    
+    // Update USD fee estimate
+    document.getElementById('usdFee').textContent = feeInUsd.toFixed(2);
     
     // Update average (using current as proxy)
     document.getElementById('avgGas').textContent = (currentGas * 0.85).toFixed(3);
