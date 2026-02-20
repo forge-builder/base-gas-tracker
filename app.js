@@ -41,50 +41,10 @@ async function fetchGasData() {
 }
 
 async function getCurrentGas() {
-    // Using Base RPC via public gateway to avoid CORS
-    const rpcUrls = [
-        'https://mainnet.base.org',
-        'https://base.llamarpc.com',
-        'https://base-mainnet.public.blastapi.io'
-    ];
-    
-    for (const rpcUrl of rpcUrls) {
-        try {
-            const response = await fetch(rpcUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    jsonrpc: '2.0',
-                    method: 'eth_gasPrice',
-                    params: [],
-                    id: 1
-                })
-            });
-            
-            if (!response.ok) continue;
-            
-            const data = await response.json();
-            if (!data.result) continue;
-            
-            const gasWei = parseInt(data.result, 16);
-            const gasGwei = (gasWei / 1e9).toFixed(4);
-            
-            return {
-                current: parseFloat(gasGwei),
-                timestamp: new Date()
-            };
-        } catch (e) {
-            console.log(`Failed ${rpcUrl}:`, e.message);
-            continue;
-        }
-    }
-    
-    // Fallback: use Owlracle API (supports CORS, no key needed for basic)
+    // Use Owlracle API - most reliable free option for Base
     try {
-        console.log('Trying Owlracle API...');
         const res = await fetch('https://api.owlracle.info/v1/base/gas');
         const data = await res.json();
-        console.log('Owlracle response:', data);
         if (data.standard) {
             return {
                 current: parseFloat(data.standard),
@@ -92,14 +52,36 @@ async function getCurrentGas() {
             };
         }
     } catch (e) {
-        console.error('Owlracle API failed:', e);
+        console.error('Owlracle failed:', e);
     }
     
-    // Last resort: use a known good value
-    return {
-        current: 0.001,
-        timestamp: new Date()
-    };
+    // Fallback to Base RPC
+    try {
+        const response = await fetch('https://mainnet.base.org', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'eth_gasPrice',
+                params: [],
+                id: 1
+            })
+        });
+        const data = await response.json();
+        if (data.result) {
+            const gasWei = parseInt(data.result, 16);
+            const gasGwei = gasWei / 1e9;
+            return {
+                current: parseFloat(gasGwei.toFixed(4)),
+                timestamp: new Date()
+            };
+        }
+    } catch (e) {
+        console.error('RPC failed:', e);
+    }
+    
+    // Last resort fallback
+    return { current: 0.01, timestamp: new Date() };
 }
 
 async function getHistoricalGas() {
