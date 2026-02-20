@@ -79,21 +79,21 @@ async function getCurrentGas() {
         }
     }
     
-    // Fallback: use a public API
+    // Fallback: use Owlracle API (supports CORS, no key needed for basic)
     try {
-        const res = await fetch('https://api.etherscan.io/api?module=gastracker&action=gasoracle&chainid=8453');
+        const res = await fetch('https://api.owlracle.info/v1/base/gas');
         const data = await res.json();
-        if (data.result && data.result.ProposeGasPrice) {
+        if (data.standard) {
             return {
-                current: parseFloat(data.result.ProposeGasPrice),
+                current: parseFloat(data.standard),
                 timestamp: new Date()
             };
         }
     } catch (e) {
-        console.error('Fallback API also failed:', e);
+        console.error('Owlracle API failed:', e);
     }
     
-    // Last resort: return mock data so UI doesn't break
+    // Last resort: use a known good value
     return {
         current: 0.001,
         timestamp: new Date()
