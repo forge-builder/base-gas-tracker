@@ -81,8 +81,10 @@ async function getCurrentGas() {
     
     // Fallback: use Owlracle API (supports CORS, no key needed for basic)
     try {
+        console.log('Trying Owlracle API...');
         const res = await fetch('https://api.owlracle.info/v1/base/gas');
         const data = await res.json();
+        console.log('Owlracle response:', data);
         if (data.standard) {
             return {
                 current: parseFloat(data.standard),
