@@ -8,7 +8,7 @@ A simple web app showing:
 - Current Base gas price (in gwei)
 - Estimated average until historical data is wired
 - Recommendation: "Transact now" / "Wait"
-- Demo historical chart scaffold
+- Data status panel that marks current gas as live and history as unwired
 
 ## Tech Stack
 - Frontend: Plain HTML/CSS/JS (simple, deploy anywhere)
@@ -17,13 +17,15 @@ A simple web app showing:
 ## Features
 1. Live gas price display
 2. Color-coded recommendation (green/yellow/red)
-3. Simple historical chart (using Chart.js)
-4. "Notify me when gas < X" - optional (later)
+3. Transaction-cost estimator with common gas-limit presets
+4. Honest data status panel instead of simulated history
+5. "Notify me when gas < X" - optional (later)
 
 ## Accuracy Notes
 - Live: current gas from `eth_gasPrice`.
-- Demo: historical chart and average are generated estimates until an indexed
-  history source is added.
+- Estimate: average is a temporary proxy until an indexed history source is
+  added.
+- No simulated historical chart should be rendered as network truth.
 - No API key should be committed for future providers; use runtime environment
   configuration if a provider is introduced.
 

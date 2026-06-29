@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Base Gas Tracker</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -61,9 +60,18 @@
                 </div>
             </div>
 
-            <div class="chart-container">
-                <h2>Gas Price History (7 days)</h2>
-                <canvas id="gasChart"></canvas>
+            <div class="data-status">
+                <h2>Data Status</h2>
+                <div class="status-grid">
+                    <div>
+                        <span class="label">Current gas</span>
+                        <span class="status-value live">Live RPC</span>
+                    </div>
+                    <div>
+                        <span class="label">Historical chart</span>
+                        <span class="status-value pending">Not wired yet</span>
+                    </div>
+                </div>
             </div>
 
             <div class="info-section">

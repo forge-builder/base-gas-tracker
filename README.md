@@ -9,13 +9,12 @@ whether a transaction should happen now or wait.
 - ⏱️ Estimated average display until historical data is wired
 - 🧮 Transaction cost estimator for common gas-limit presets
 - 💡 Smart recommendations (transact now / wait)
-- 📈 Demo 7-day chart scaffold
+- 🟢 Honest data status panel instead of simulated history
 - 🎨 Clean, modern UI
 
 ## Tech Stack
 
 - Plain HTML/CSS/JS
-- Chart.js for visualizations
 - Base RPC for current gas data
 
 ## Quick Start
@@ -55,9 +54,9 @@ vercel
 
 ## Current Accuracy
 
-The current gas value is fetched live from Base RPC. The chart and average are
-demo/estimate surfaces until a real history provider is added. Do not present
-them as historical network truth yet.
+The current gas value is fetched live from Base RPC. The average remains an
+estimate until a real history provider is added. The app intentionally does not
+render simulated historical charts as network truth.
 
 ## Future Features
 

@@ -164,7 +164,7 @@ header h1 {
     grid-column: 1 / -1;
 }
 
-.chart-container {
+.data-status {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 15px;
     padding: 20px;
@@ -172,10 +172,44 @@ header h1 {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.chart-container h2 {
+.data-status h2 {
     font-size: 1rem;
     margin-bottom: 15px;
     color: #8b8b9e;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.status-grid div {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.status-grid .label {
+    display: block;
+    color: #8b8b9e;
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.status-value.live {
+    color: #00ff88;
+}
+
+.status-value.pending {
+    color: #ffc800;
 }
 
 .info-section {
@@ -227,6 +261,10 @@ footer a {
     }
 
     .estimator-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .status-grid {
         grid-template-columns: 1fr;
     }
 }

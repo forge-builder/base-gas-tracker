@@ -1,12 +1,10 @@
 // Base Gas Tracker - Main Logic
 
 const BASE_RPC = 'https://mainnet.base.org';
-let gasChart = null;
 let currentData = 0;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    initChart();
     fetchGasData();
     document.getElementById('refreshBtn').addEventListener('click', fetchGasData);
     document.getElementById('txPreset').addEventListener('change', updateEstimator);
@@ -25,11 +23,6 @@ async function fetchGasData() {
         
         // Update UI
         updateDisplay(gasData);
-        
-        // Fetch demo historical data. Production history needs an indexed data
-        // source; do not imply these generated points are live network history.
-        const historyData = await getHistoricalGas();
-        updateChart(historyData);
         
     } catch (error) {
         console.error('Error fetching gas data:', error);
@@ -100,23 +93,6 @@ async function getCurrentGas() {
     };
 }
 
-async function getHistoricalGas() {
-    // Generate demo data for the chart until a real history provider is wired.
-    const labels = [];
-    const prices = [];
-    
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
-        
-        // Demo range: 0.001 - 0.05 gwei.
-        prices.push((Math.random() * 0.05 + 0.001).toFixed(3));
-    }
-    
-    return { labels, prices };
-}
-
 function updateDisplay(gasData) {
     const currentGas = gasData.current;
     currentData = currentGas; // Store for avg calculation
@@ -182,58 +158,4 @@ function updateEstimator() {
 
     ethOutput.textContent = totalEth.toFixed(8);
     gweiOutput.textContent = `${totalGwei.toFixed(2)} gwei at ${gasLimit.toLocaleString()} gas`;
-}
-
-function initChart() {
-    const ctx = document.getElementById('gasChart').getContext('2d');
-    
-    gasChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Gas Price (gwei)',
-                data: [],
-                borderColor: '#0052ff',
-                backgroundColor: 'rgba(0, 82, 255, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    ticks: {
-                        color: '#8b8b9e'
-                    }
-                },
-                x: {
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    ticks: {
-                        color: '#8b8b9e'
-                    }
-                }
-            }
-        }
-    });
-}
-
-function updateChart(historyData) {
-    if (!gasChart) return;
-    
-    gasChart.data.labels = historyData.labels;
-    gasChart.data.datasets[0].data = historyData.prices;
-    gasChart.update();
 }
