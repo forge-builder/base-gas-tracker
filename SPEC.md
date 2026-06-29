@@ -6,19 +6,26 @@ Users on Base don't have an easy way to track gas prices and optimize when to tr
 ## Solution
 A simple web app showing:
 - Current Base gas price (in gwei)
-- Average gas price (last 1hr, 24hr)
+- Estimated average until historical data is wired
 - Recommendation: "Transact now" / "Wait"
-- Historical chart (7 days)
+- Demo historical chart scaffold
 
 ## Tech Stack
 - Frontend: Plain HTML/CSS/JS (simple, deploy anywhere)
-- Data: Base RPC + Covalent API (free tier)
+- Data: public Base RPC endpoints for current gas
 
 ## Features
 1. Live gas price display
 2. Color-coded recommendation (green/yellow/red)
 3. Simple historical chart (using Chart.js)
 4. "Notify me when gas < X" - optional (later)
+
+## Accuracy Notes
+- Live: current gas from `eth_gasPrice`.
+- Demo: historical chart and average are generated estimates until an indexed
+  history source is added.
+- No API key should be committed for future providers; use runtime environment
+  configuration if a provider is introduced.
 
 ## Revenue Model
 - Free tier: basic gas info
@@ -33,6 +40,8 @@ A simple web app showing:
 
 ## Status
 - [x] Spec written
-- [ ] Code
+- [x] Code scaffold
+- [x] Live current gas RPC path
+- [ ] Real history provider
 - [ ] Deploy (could use Vercel, Netlify, or IPFS)
 - [ ] Post about it

@@ -1,7 +1,6 @@
 // Base Gas Tracker - Main Logic
 
 const BASE_RPC = 'https://mainnet.base.org';
-const COVALENT_API_KEY = 'ckey_live_'; // Free tier - limited
 let gasChart = null;
 let currentData = 0;
 
@@ -25,7 +24,8 @@ async function fetchGasData() {
         // Update UI
         updateDisplay(gasData);
         
-        // Fetch historical data (mock for now - real implementation needs API)
+        // Fetch demo historical data. Production history needs an indexed data
+        // source; do not imply these generated points are live network history.
         const historyData = await getHistoricalGas();
         updateChart(historyData);
         
@@ -99,8 +99,7 @@ async function getCurrentGas() {
 }
 
 async function getHistoricalGas() {
-    // Generate mock historical data (last 7 days)
-    // In production, use Covalent API or similar
+    // Generate demo data for the chart until a real history provider is wired.
     const labels = [];
     const prices = [];
     
@@ -109,7 +108,7 @@ async function getHistoricalGas() {
         date.setDate(date.getDate() - i);
         labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
         
-        // Mock data: 0.001 - 0.05 gwei (typical Base gas)
+        // Demo range: 0.001 - 0.05 gwei.
         prices.push((Math.random() * 0.05 + 0.001).toFixed(3));
     }
     
@@ -123,7 +122,7 @@ function updateDisplay(gasData) {
     // Update current gas
     document.getElementById('currentGas').textContent = currentGas.toFixed(3);
     
-    // Update average (using current as proxy)
+    // Update estimate (using current gas as a proxy until real history exists).
     document.getElementById('avgGas').textContent = (currentGas * 0.85).toFixed(3);
     
     // Update recommendation

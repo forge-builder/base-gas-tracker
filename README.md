@@ -1,20 +1,21 @@
 # Base Gas Tracker
 
-A simple web app to track Base network gas prices and help users optimize their transactions.
+A simple web app to track current Base network gas prices and help users decide
+whether a transaction should happen now or wait.
 
 ## Features
 
-- 📊 Real-time gas price display
-- ⏱️ 1-hour average tracking
+- 📊 Current gas price display from public Base RPC endpoints
+- ⏱️ Estimated average display until historical data is wired
 - 💡 Smart recommendations (transact now / wait)
-- 📈 7-day historical chart
+- 📈 Demo 7-day chart scaffold
 - 🎨 Clean, modern UI
 
 ## Tech Stack
 
 - Plain HTML/CSS/JS
 - Chart.js for visualizations
-- Base RPC for gas data
+- Base RPC for current gas data
 
 ## Quick Start
 
@@ -48,13 +49,23 @@ vercel
 
 - Base RPC: `https://mainnet.base.org`
 - Method: `eth_gasPrice`
+- Fallback RPCs: `https://base.llamarpc.com`,
+  `https://base-mainnet.public.blastapi.io`
+
+## Current Accuracy
+
+The current gas value is fetched live from Base RPC. The chart and average are
+demo/estimate surfaces until a real history provider is added. Do not present
+them as historical network truth yet.
 
 ## Future Features
 
+- [ ] Transaction cost estimator
+- [ ] Real historical gas provider
 - [ ] Gas alerts (notify when gas drops below X)
 - [ ] Multi-network support (OP, Arbitrum, zkSync)
 - [ ] Portfolio integration
-- [ ] Transaction cost estimator
+- [ ] Hosted demo with a visible freshness timestamp
 
 ## Built by
 
