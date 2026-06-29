@@ -7,6 +7,7 @@ whether a transaction should happen now or wait.
 
 - 📊 Current gas price display from public Base RPC endpoints
 - ⏱️ Estimated average display until historical data is wired
+- 🧮 Transaction cost estimator for common gas-limit presets
 - 💡 Smart recommendations (transact now / wait)
 - 📈 Demo 7-day chart scaffold
 - 🎨 Clean, modern UI
@@ -60,7 +61,7 @@ them as historical network truth yet.
 
 ## Future Features
 
-- [ ] Transaction cost estimator
+- [x] Transaction cost estimator
 - [ ] Real historical gas provider
 - [ ] Gas alerts (notify when gas drops below X)
 - [ ] Multi-network support (OP, Arbitrum, zkSync)

@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initChart();
     fetchGasData();
     document.getElementById('refreshBtn').addEventListener('click', fetchGasData);
+    document.getElementById('txPreset').addEventListener('change', updateEstimator);
+    document.getElementById('customGasLimit').addEventListener('input', updateEstimator);
 });
 
 // Fetch gas data from Base
@@ -145,6 +147,41 @@ function updateDisplay(gasData) {
     
     // Update timestamp
     document.getElementById('lastUpdated').textContent = gasData.timestamp.toLocaleTimeString();
+
+    updateEstimator();
+}
+
+function getSelectedGasLimit() {
+    const preset = Number(document.getElementById('txPreset').value);
+    const customInput = document.getElementById('customGasLimit');
+
+    customInput.disabled = preset !== 0;
+
+    if (preset !== 0) {
+        customInput.value = String(preset);
+        return preset;
+    }
+
+    const customLimit = Number(customInput.value);
+    return Number.isFinite(customLimit) && customLimit > 0 ? customLimit : 21000;
+}
+
+function updateEstimator() {
+    const ethOutput = document.getElementById('estimatedCostEth');
+    const gweiOutput = document.getElementById('estimatedCostGwei');
+
+    if (!currentData) {
+        ethOutput.textContent = '--';
+        gweiOutput.textContent = '--';
+        return;
+    }
+
+    const gasLimit = getSelectedGasLimit();
+    const totalGwei = currentData * gasLimit;
+    const totalEth = totalGwei / 1e9;
+
+    ethOutput.textContent = totalEth.toFixed(8);
+    gweiOutput.textContent = `${totalGwei.toFixed(2)} gwei at ${gasLimit.toLocaleString()} gas`;
 }
 
 function initChart() {

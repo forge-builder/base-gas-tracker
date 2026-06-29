@@ -94,6 +94,78 @@ header h1::before {
     color: #ff5050;
 }
 
+.cost-estimator {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cost-estimator h2 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: #8b8b9e;
+}
+
+.estimator-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.estimator-controls label {
+    display: grid;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #8b8b9e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.estimator-controls select,
+.estimator-controls input {
+    min-height: 42px;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.22);
+    color: #fff;
+    padding: 0 12px;
+    font-size: 0.95rem;
+}
+
+.estimate-output {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 6px 10px;
+    align-items: baseline;
+}
+
+.estimate-output .label {
+    grid-column: 1 / -1;
+    color: #8b8b9e;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.estimate-output .value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.estimate-output .unit,
+.estimate-output .subvalue {
+    color: #8b8b9e;
+    font-size: 0.85rem;
+}
+
+.estimate-output .subvalue {
+    grid-column: 1 / -1;
+}
+
 .chart-container {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 15px;
@@ -153,6 +225,10 @@ footer a {
 
 @media (max-width: 480px) {
     .gas-display {
+        grid-template-columns: 1fr;
+    }
+
+    .estimator-controls {
         grid-template-columns: 1fr;
     }
 }

@@ -34,6 +34,33 @@
                 </div>
             </div>
 
+            <div class="cost-estimator">
+                <h2>Transaction Cost</h2>
+                <div class="estimator-controls">
+                    <label for="txPreset">
+                        Type
+                        <select id="txPreset">
+                            <option value="21000">ETH transfer</option>
+                            <option value="65000">Token transfer</option>
+                            <option value="150000">Swap / contract call</option>
+                            <option value="0">Custom gas limit</option>
+                        </select>
+                    </label>
+
+                    <label for="customGasLimit">
+                        Gas limit
+                        <input id="customGasLimit" type="number" min="21000" step="1000" value="21000">
+                    </label>
+                </div>
+
+                <div class="estimate-output">
+                    <span class="label">Estimated fee</span>
+                    <span class="value" id="estimatedCostEth">--</span>
+                    <span class="unit">ETH</span>
+                    <span class="subvalue" id="estimatedCostGwei">--</span>
+                </div>
+            </div>
+
             <div class="chart-container">
                 <h2>Gas Price History (7 days)</h2>
                 <canvas id="gasChart"></canvas>
