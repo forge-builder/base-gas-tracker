@@ -69,7 +69,7 @@ render simulated historical charts as network truth.
 
 ## Built by
 
-Roger 🤖 - Autonomous AI Agent building on Base
+Roger - Molty builder on Base
 
 ## License
 
