@@ -1,7 +1,9 @@
 // Base Gas Tracker - Main Logic
 
 const BASE_RPC = 'https://mainnet.base.org';
+const ETH_USD_API = 'https://api.coinbase.com/v2/exchange-rates?currency=ETH';
 let currentData = 0;
+let ethUsdRate = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,16 +19,29 @@ async function fetchGasData() {
     btn.disabled = true;
     btn.textContent = '⏳ Loading...';
 
+    const priceRequest = getEthUsdRate()
+        .then((priceData) => {
+            ethUsdRate = priceData.rate;
+            updateEthUsdStatus(priceData);
+        })
+        .catch((error) => {
+            console.error('Error fetching ETH/USD rate:', error);
+            ethUsdRate = null;
+            updateEthUsdStatus(null);
+        });
+
     try {
         // Get current gas from Base RPC
         const gasData = await getCurrentGas();
+        await priceRequest;
         
         // Update UI
         updateDisplay(gasData);
         
     } catch (error) {
         console.error('Error fetching gas data:', error);
-        document.getElementById('currentGas').textContent = 'Error';
+        await priceRequest;
+        showGasError();
     } finally {
         btn.disabled = false;
         btn.textContent = '🔄 Refresh';
@@ -36,14 +51,14 @@ async function fetchGasData() {
 async function getCurrentGas() {
     // Using Base RPC via public gateway to avoid CORS
     const rpcUrls = [
-        'https://mainnet.base.org',
-        'https://base.llamarpc.com',
-        'https://base-mainnet.public.blastapi.io'
+        { url: BASE_RPC, label: 'Base RPC' },
+        { url: 'https://base.llamarpc.com', label: 'LlamaRPC' },
+        { url: 'https://base-mainnet.public.blastapi.io', label: 'Blast API' }
     ];
     
-    for (const rpcUrl of rpcUrls) {
+    for (const { url, label } of rpcUrls) {
         try {
-            const response = await fetch(rpcUrl, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -64,10 +79,11 @@ async function getCurrentGas() {
             
             return {
                 current: parseFloat(gasGwei),
-                timestamp: new Date()
+                timestamp: new Date(),
+                source: label
             };
         } catch (e) {
-            console.log(`Failed ${rpcUrl}:`, e.message);
+            console.log(`Failed ${url}:`, e.message);
             continue;
         }
     }
@@ -79,16 +95,31 @@ async function getCurrentGas() {
         if (data.result && data.result.ProposeGasPrice) {
             return {
                 current: parseFloat(data.result.ProposeGasPrice),
-                timestamp: new Date()
+                timestamp: new Date(),
+                source: 'Etherscan fallback'
             };
         }
     } catch (e) {
         console.error('Fallback API also failed:', e);
     }
     
-    // Last resort: return mock data so UI doesn't break
+    throw new Error('No gas source returned a current Base gas price.');
+}
+
+async function getEthUsdRate() {
+    const response = await fetch(ETH_USD_API);
+    if (!response.ok) {
+        throw new Error(`ETH/USD request failed with ${response.status}`);
+    }
+
+    const data = await response.json();
+    const usdRate = Number(data?.data?.rates?.USD);
+    if (!Number.isFinite(usdRate) || usdRate <= 0) {
+        throw new Error('ETH/USD response did not include a usable USD rate.');
+    }
+
     return {
-        current: 0.001,
+        rate: usdRate,
         timestamp: new Date()
     };
 }
@@ -99,6 +130,8 @@ function updateDisplay(gasData) {
     
     // Update current gas
     document.getElementById('currentGas').textContent = currentGas.toFixed(3);
+    document.getElementById('currentGasStatus').textContent = gasData.source;
+    document.getElementById('currentGasStatus').className = 'status-value live';
     
     // Update estimate (using current gas as a proxy until real history exists).
     document.getElementById('avgGas').textContent = (currentGas * 0.85).toFixed(3);
@@ -127,6 +160,33 @@ function updateDisplay(gasData) {
     updateEstimator();
 }
 
+function updateEthUsdStatus(priceData) {
+    const statusEl = document.getElementById('ethUsdStatus');
+
+    if (!priceData) {
+        statusEl.textContent = 'Unavailable';
+        statusEl.className = 'status-value pending';
+        return;
+    }
+
+    statusEl.textContent = `Coinbase $${priceData.rate.toLocaleString('en-US', {
+        maximumFractionDigits: 0
+    })}`;
+    statusEl.className = 'status-value live';
+}
+
+function showGasError() {
+    currentData = 0;
+    document.getElementById('currentGas').textContent = 'Error';
+    document.getElementById('avgGas').textContent = '--';
+    document.getElementById('recommendation').textContent = 'Unavailable';
+    document.getElementById('recommendation').className = 'value high';
+    document.getElementById('currentGasStatus').textContent = 'Unavailable';
+    document.getElementById('currentGasStatus').className = 'status-value pending';
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+    updateEstimator();
+}
+
 function getSelectedGasLimit() {
     const preset = Number(document.getElementById('txPreset').value);
     const customInput = document.getElementById('customGasLimit');
@@ -145,10 +205,12 @@ function getSelectedGasLimit() {
 function updateEstimator() {
     const ethOutput = document.getElementById('estimatedCostEth');
     const gweiOutput = document.getElementById('estimatedCostGwei');
+    const usdOutput = document.getElementById('estimatedCostUsd');
 
     if (!currentData) {
         ethOutput.textContent = '--';
         gweiOutput.textContent = '--';
+        usdOutput.textContent = 'USD estimate unavailable';
         return;
     }
 
@@ -157,5 +219,19 @@ function updateEstimator() {
     const totalEth = totalGwei / 1e9;
 
     ethOutput.textContent = totalEth.toFixed(8);
-    gweiOutput.textContent = `${totalGwei.toFixed(2)} gwei at ${gasLimit.toLocaleString()} gas`;
+    gweiOutput.textContent = `${totalGwei.toFixed(2)} gwei at ${gasLimit.toLocaleString('en-US')} gas`;
+    usdOutput.textContent = ethUsdRate
+        ? `~${formatUsd(totalEth * ethUsdRate)} at live ETH/USD`
+        : 'USD estimate unavailable';
+}
+
+function formatUsd(amount) {
+    if (amount >= 0.01) {
+        return `$${amount.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 4
+        })}`;
+    }
+
+    return `$${amount.toFixed(6)}`;
 }

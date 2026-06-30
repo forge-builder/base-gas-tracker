@@ -22,7 +22,7 @@
                 </div>
                 
                 <div class="gas-card average">
-                    <span class="label">1h Average</span>
+                    <span class="label">Est. Average</span>
                     <span class="value" id="avgGas">--</span>
                     <span class="unit">gwei</span>
                 </div>
@@ -57,6 +57,7 @@
                     <span class="value" id="estimatedCostEth">--</span>
                     <span class="unit">ETH</span>
                     <span class="subvalue" id="estimatedCostGwei">--</span>
+                    <span class="subvalue" id="estimatedCostUsd">USD estimate unavailable</span>
                 </div>
             </div>
 
@@ -65,7 +66,11 @@
                 <div class="status-grid">
                     <div>
                         <span class="label">Current gas</span>
-                        <span class="status-value live">Live RPC</span>
+                        <span class="status-value live" id="currentGasStatus">Live RPC</span>
+                    </div>
+                    <div>
+                        <span class="label">ETH/USD</span>
+                        <span class="status-value pending" id="ethUsdStatus">Loading</span>
                     </div>
                     <div>
                         <span class="label">Historical chart</span>
