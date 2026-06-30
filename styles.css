@@ -65,6 +65,10 @@ header h1 {
     margin-bottom: 5px;
 }
 
+.gas-card .value.text-value {
+    font-size: 1.25rem;
+}
+
 .gas-card .unit {
     font-size: 0.8rem;
     color: #8b8b9e;

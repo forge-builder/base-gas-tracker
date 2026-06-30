@@ -6,7 +6,7 @@ whether a transaction should happen now or wait.
 ## Features
 
 - 📊 Current gas price display from public Base RPC endpoints
-- ⏱️ Estimated average display until historical data is wired
+- 🧾 Fee-basis display that names the live source used for estimates
 - 🧮 Transaction cost estimator for common gas-limit presets
 - 💵 Optional USD fee estimate from a live ETH/USD exchange-rate endpoint
 - 💡 Smart recommendations (transact now / wait)
@@ -57,9 +57,10 @@ vercel
 ## Current Accuracy
 
 The current gas value is fetched live from Base RPC. The USD estimate uses the
-current ETH/USD helper rate when available. The average remains an estimate
+current ETH/USD helper rate when available. Historical averages remain absent
 until a real history provider is added. The app intentionally does not render
-simulated historical charts or mock gas values as network truth.
+simulated historical charts, synthetic averages, or mock gas values as network
+truth.
 
 ## Future Features
 

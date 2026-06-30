@@ -6,7 +6,7 @@ Users on Base don't have an easy way to track gas prices and optimize when to tr
 ## Solution
 A simple web app showing:
 - Current Base gas price (in gwei)
-- Estimated average until historical data is wired
+- Fee-basis status for the live source used by the estimator
 - Estimated transaction cost in ETH and USD
 - Recommendation: "Transact now" / "Wait"
 - Data status panel that marks current gas as live and history as unwired
@@ -27,8 +27,8 @@ A simple web app showing:
 ## Accuracy Notes
 - Live: current gas from `eth_gasPrice`.
 - Helper estimate: ETH/USD from a public exchange-rate endpoint.
-- Estimate: average is a temporary proxy until an indexed history source is
-  added.
+- Historical averages remain absent until an indexed history source is added.
+- No synthetic average should be rendered as network truth.
 - No simulated historical chart should be rendered as network truth.
 - No mock gas fallback should be rendered as live network truth.
 - No API key should be committed for future providers; use runtime environment

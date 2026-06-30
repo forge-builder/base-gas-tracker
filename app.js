@@ -133,8 +133,9 @@ function updateDisplay(gasData) {
     document.getElementById('currentGasStatus').textContent = gasData.source;
     document.getElementById('currentGasStatus').className = 'status-value live';
     
-    // Update estimate (using current gas as a proxy until real history exists).
-    document.getElementById('avgGas').textContent = (currentGas * 0.85).toFixed(3);
+    // Keep derived estimates tied to the live RPC value until history exists.
+    document.getElementById('feeBasis').textContent = 'Live';
+    document.getElementById('feeBasisUnit').textContent = gasData.source;
     
     // Update recommendation
     const recEl = document.getElementById('recommendation');
@@ -178,7 +179,8 @@ function updateEthUsdStatus(priceData) {
 function showGasError() {
     currentData = 0;
     document.getElementById('currentGas').textContent = 'Error';
-    document.getElementById('avgGas').textContent = '--';
+    document.getElementById('feeBasis').textContent = 'No source';
+    document.getElementById('feeBasisUnit').textContent = '--';
     document.getElementById('recommendation').textContent = 'Unavailable';
     document.getElementById('recommendation').className = 'value high';
     document.getElementById('currentGasStatus').textContent = 'Unavailable';
