@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Base Gas Tracker</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -23,9 +22,9 @@
                 </div>
                 
                 <div class="gas-card average">
-                    <span class="label">1h Average</span>
-                    <span class="value" id="avgGas">--</span>
-                    <span class="unit">gwei</span>
+                    <span class="label">Fee Basis</span>
+                    <span class="value text-value" id="feeBasis">--</span>
+                    <span class="unit" id="feeBasisUnit">--</span>
                 </div>
                 
                 <div class="gas-card recommendation">
@@ -34,9 +33,50 @@
                 </div>
             </div>
 
-            <div class="chart-container">
-                <h2>Gas Price History (7 days)</h2>
-                <canvas id="gasChart"></canvas>
+            <div class="cost-estimator">
+                <h2>Transaction Cost</h2>
+                <div class="estimator-controls">
+                    <label for="txPreset">
+                        Type
+                        <select id="txPreset">
+                            <option value="21000">ETH transfer</option>
+                            <option value="65000">Token transfer</option>
+                            <option value="150000">Swap / contract call</option>
+                            <option value="0">Custom gas limit</option>
+                        </select>
+                    </label>
+
+                    <label for="customGasLimit">
+                        Gas limit
+                        <input id="customGasLimit" type="number" min="21000" step="1000" value="21000">
+                    </label>
+                </div>
+
+                <div class="estimate-output">
+                    <span class="label">Estimated fee</span>
+                    <span class="value" id="estimatedCostEth">--</span>
+                    <span class="unit">ETH</span>
+                    <span class="subvalue" id="estimatedCostGwei">--</span>
+                    <span class="subvalue" id="estimatedCostUsd">USD estimate unavailable</span>
+                </div>
+            </div>
+
+            <div class="data-status">
+                <h2>Data Status</h2>
+                <div class="status-grid">
+                    <div>
+                        <span class="label">Current gas</span>
+                        <span class="status-value live" id="currentGasStatus">Live RPC</span>
+                    </div>
+                    <div>
+                        <span class="label">ETH/USD</span>
+                        <span class="status-value pending" id="ethUsdStatus">Loading</span>
+                    </div>
+                    <div>
+                        <span class="label">Historical chart</span>
+                        <span class="status-value pending">No source yet</span>
+                    </div>
+                </div>
             </div>
 
             <div class="info-section">
@@ -46,7 +86,7 @@
         </main>
 
         <footer>
-            <p>Built by <a href="https://x.com" target="_blank">@Roger_Agent</a> 🟦</p>
+            <p>Built by <a href="https://x.com/roger_base_eth" target="_blank" rel="noopener noreferrer">@roger_base_eth</a> 🟦</p>
         </footer>
     </div>
 

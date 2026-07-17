@@ -1,15 +1,16 @@
 // Base Gas Tracker - Main Logic
 
 const BASE_RPC = 'https://mainnet.base.org';
-const COVALENT_API_KEY = 'ckey_live_'; // Free tier - limited
-let gasChart = null;
+const ETH_USD_API = 'https://api.coinbase.com/v2/exchange-rates?currency=ETH';
 let currentData = 0;
+let ethUsdRate = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    initChart();
     fetchGasData();
     document.getElementById('refreshBtn').addEventListener('click', fetchGasData);
+    document.getElementById('txPreset').addEventListener('change', updateEstimator);
+    document.getElementById('customGasLimit').addEventListener('input', updateEstimator);
 });
 
 // Fetch gas data from Base
@@ -18,20 +19,29 @@ async function fetchGasData() {
     btn.disabled = true;
     btn.textContent = '⏳ Loading...';
 
+    const priceRequest = getEthUsdRate()
+        .then((priceData) => {
+            ethUsdRate = priceData.rate;
+            updateEthUsdStatus(priceData);
+        })
+        .catch((error) => {
+            console.error('Error fetching ETH/USD rate:', error);
+            ethUsdRate = null;
+            updateEthUsdStatus(null);
+        });
+
     try {
         // Get current gas from Base RPC
         const gasData = await getCurrentGas();
+        await priceRequest;
         
         // Update UI
         updateDisplay(gasData);
         
-        // Fetch historical data (mock for now - real implementation needs API)
-        const historyData = await getHistoricalGas();
-        updateChart(historyData);
-        
     } catch (error) {
         console.error('Error fetching gas data:', error);
-        document.getElementById('currentGas').textContent = 'Error';
+        await priceRequest;
+        showGasError();
     } finally {
         btn.disabled = false;
         btn.textContent = '🔄 Refresh';
@@ -41,14 +51,14 @@ async function fetchGasData() {
 async function getCurrentGas() {
     // Using Base RPC via public gateway to avoid CORS
     const rpcUrls = [
-        'https://mainnet.base.org',
-        'https://base.llamarpc.com',
-        'https://base-mainnet.public.blastapi.io'
+        { url: BASE_RPC, label: 'Base RPC' },
+        { url: 'https://base.llamarpc.com', label: 'LlamaRPC' },
+        { url: 'https://base-mainnet.public.blastapi.io', label: 'Blast API' }
     ];
     
-    for (const rpcUrl of rpcUrls) {
+    for (const { url, label } of rpcUrls) {
         try {
-            const response = await fetch(rpcUrl, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -69,10 +79,11 @@ async function getCurrentGas() {
             
             return {
                 current: parseFloat(gasGwei),
-                timestamp: new Date()
+                timestamp: new Date(),
+                source: label
             };
         } catch (e) {
-            console.log(`Failed ${rpcUrl}:`, e.message);
+            console.log(`Failed ${url}:`, e.message);
             continue;
         }
     }
@@ -84,47 +95,47 @@ async function getCurrentGas() {
         if (data.result && data.result.ProposeGasPrice) {
             return {
                 current: parseFloat(data.result.ProposeGasPrice),
-                timestamp: new Date()
+                timestamp: new Date(),
+                source: 'Etherscan fallback'
             };
         }
     } catch (e) {
         console.error('Fallback API also failed:', e);
     }
     
-    // Last resort: return mock data so UI doesn't break
+    throw new Error('No gas source returned a current Base gas price.');
+}
+
+async function getEthUsdRate() {
+    const response = await fetch(ETH_USD_API);
+    if (!response.ok) {
+        throw new Error(`ETH/USD request failed with ${response.status}`);
+    }
+
+    const data = await response.json();
+    const usdRate = Number(data?.data?.rates?.USD);
+    if (!Number.isFinite(usdRate) || usdRate <= 0) {
+        throw new Error('ETH/USD response did not include a usable USD rate.');
+    }
+
     return {
-        current: 0.001,
+        rate: usdRate,
         timestamp: new Date()
     };
 }
 
-async function getHistoricalGas() {
-    // Generate mock historical data (last 7 days)
-    // In production, use Covalent API or similar
-    const labels = [];
-    const prices = [];
-    
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
-        
-        // Mock data: 0.001 - 0.05 gwei (typical Base gas)
-        prices.push((Math.random() * 0.05 + 0.001).toFixed(3));
-    }
-    
-    return { labels, prices };
-}
-
 function updateDisplay(gasData) {
     const currentGas = gasData.current;
-    currentData = currentGas; // Store for avg calculation
+    currentData = currentGas;
     
     // Update current gas
     document.getElementById('currentGas').textContent = currentGas.toFixed(3);
+    document.getElementById('currentGasStatus').textContent = gasData.source;
+    document.getElementById('currentGasStatus').className = 'status-value live';
     
-    // Update average (using current as proxy)
-    document.getElementById('avgGas').textContent = (currentGas * 0.85).toFixed(3);
+    // Keep derived estimates tied to the live RPC value until history exists.
+    document.getElementById('feeBasis').textContent = 'Live';
+    document.getElementById('feeBasisUnit').textContent = gasData.source;
     
     // Update recommendation
     const recEl = document.getElementById('recommendation');
@@ -146,58 +157,83 @@ function updateDisplay(gasData) {
     
     // Update timestamp
     document.getElementById('lastUpdated').textContent = gasData.timestamp.toLocaleTimeString();
+
+    updateEstimator();
 }
 
-function initChart() {
-    const ctx = document.getElementById('gasChart').getContext('2d');
-    
-    gasChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Gas Price (gwei)',
-                data: [],
-                borderColor: '#0052ff',
-                backgroundColor: 'rgba(0, 82, 255, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    ticks: {
-                        color: '#8b8b9e'
-                    }
-                },
-                x: {
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    ticks: {
-                        color: '#8b8b9e'
-                    }
-                }
-            }
-        }
-    });
+function updateEthUsdStatus(priceData) {
+    const statusEl = document.getElementById('ethUsdStatus');
+
+    if (!priceData) {
+        statusEl.textContent = 'Unavailable';
+        statusEl.className = 'status-value pending';
+        return;
+    }
+
+    statusEl.textContent = `Coinbase $${priceData.rate.toLocaleString('en-US', {
+        maximumFractionDigits: 0
+    })}`;
+    statusEl.className = 'status-value live';
 }
 
-function updateChart(historyData) {
-    if (!gasChart) return;
-    
-    gasChart.data.labels = historyData.labels;
-    gasChart.data.datasets[0].data = historyData.prices;
-    gasChart.update();
+function showGasError() {
+    currentData = 0;
+    document.getElementById('currentGas').textContent = 'Error';
+    document.getElementById('feeBasis').textContent = 'No source';
+    document.getElementById('feeBasisUnit').textContent = '--';
+    document.getElementById('recommendation').textContent = 'Unavailable';
+    document.getElementById('recommendation').className = 'value high';
+    document.getElementById('currentGasStatus').textContent = 'Unavailable';
+    document.getElementById('currentGasStatus').className = 'status-value pending';
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+    updateEstimator();
+}
+
+function getSelectedGasLimit() {
+    const preset = Number(document.getElementById('txPreset').value);
+    const customInput = document.getElementById('customGasLimit');
+
+    customInput.disabled = preset !== 0;
+
+    if (preset !== 0) {
+        customInput.value = String(preset);
+        return preset;
+    }
+
+    const customLimit = Number(customInput.value);
+    return Number.isFinite(customLimit) && customLimit > 0 ? customLimit : 21000;
+}
+
+function updateEstimator() {
+    const ethOutput = document.getElementById('estimatedCostEth');
+    const gweiOutput = document.getElementById('estimatedCostGwei');
+    const usdOutput = document.getElementById('estimatedCostUsd');
+
+    if (!currentData) {
+        ethOutput.textContent = '--';
+        gweiOutput.textContent = '--';
+        usdOutput.textContent = 'USD estimate unavailable';
+        return;
+    }
+
+    const gasLimit = getSelectedGasLimit();
+    const totalGwei = currentData * gasLimit;
+    const totalEth = totalGwei / 1e9;
+
+    ethOutput.textContent = totalEth.toFixed(8);
+    gweiOutput.textContent = `${totalGwei.toFixed(2)} gwei at ${gasLimit.toLocaleString('en-US')} gas`;
+    usdOutput.textContent = ethUsdRate
+        ? `~${formatUsd(totalEth * ethUsdRate)} at live ETH/USD`
+        : 'USD estimate unavailable';
+}
+
+function formatUsd(amount) {
+    if (amount >= 0.01) {
+        return `$${amount.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 4
+        })}`;
+    }
+
+    return `$${amount.toFixed(6)}`;
 }
