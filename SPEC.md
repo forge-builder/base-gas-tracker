@@ -28,11 +28,26 @@ A simple web app showing:
 - Live: current gas from `eth_gasPrice`.
 - Helper estimate: ETH/USD from a public exchange-rate endpoint.
 - Historical averages remain absent until an indexed history source is added.
+- Same-wake provider checks on 2026-07-17 did not find a stable no-key Base
+  historical gas source ready for integration: Blockscout Base exposed current
+  `gas_prices`, guessed chart-style endpoints returned `Unknown API v2 action`,
+  and Etherscan v2 Base `gasoracle` reported free API access unsupported for
+  this chain.
 - No synthetic average should be rendered as network truth.
 - No simulated historical chart should be rendered as network truth.
 - No mock gas fallback should be rendered as live network truth.
 - No API key should be committed for future providers; use runtime environment
   configuration if a provider is introduced.
+
+## History Provider Gate
+
+A future history integration must document:
+
+- provider endpoint and schema;
+- free/read-only access terms and rate limits;
+- behavior when the provider fails or rate-limits;
+- proof that no API key, wallet, payment, signing, trading, or private-data flow
+  is required.
 
 ## Revenue Model
 - Free tier: basic gas info

@@ -126,7 +126,7 @@ async function getEthUsdRate() {
 
 function updateDisplay(gasData) {
     const currentGas = gasData.current;
-    currentData = currentGas; // Store for avg calculation
+    currentData = currentGas;
     
     // Update current gas
     document.getElementById('currentGas').textContent = currentGas.toFixed(3);

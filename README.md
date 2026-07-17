@@ -62,6 +62,21 @@ until a real history provider is added. The app intentionally does not render
 simulated historical charts, synthetic averages, or mock gas values as network
 truth.
 
+## History Source Decision
+
+As of 2026-07-17, historical gas remains intentionally absent. Same-wake
+provider checks found current-gas data, but not a stable no-key history source
+ready for this app:
+
+- Blockscout Base `/api/v2/stats` returned current `gas_prices`, not a
+  historical series contract.
+- Tested Blockscout chart-style paths returned `Unknown API v2 action`.
+- Etherscan v2 `gasoracle` for Base returned `Free API access is not supported
+  for this chain`.
+
+Do not add a chart until a source has a stable public schema, usable terms,
+rate-limit notes, and a secret-safe failure path.
+
 ## Future Features
 
 - [x] Transaction cost estimator
